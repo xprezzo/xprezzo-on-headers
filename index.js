@@ -7,13 +7,6 @@
 'use strict'
 
 /**
- * Module exports.
- * @public
- */
-
-module.exports = onHeaders
-
-/**
  * Create a replacement writeHead method.
  *
  * @param {function} prevWriteHead
@@ -22,12 +15,12 @@ module.exports = onHeaders
  */
 
 function createWriteHead (prevWriteHead, listener) {
-  var fired = false
+  let fired = false
 
   // return function with core name and argument list
-  return function writeHead (statusCode) {
+  return function (statusCode) {
     // set headers from arguments
-    var args = setWriteHeadHeaders.apply(this, arguments)
+    const args = setWriteHeadHeaders.apply(this, arguments)
 
     // fire listener
     if (!fired) {
@@ -46,26 +39,6 @@ function createWriteHead (prevWriteHead, listener) {
 }
 
 /**
- * Execute a listener when a response is about to write headers.
- *
- * @param {object} res
- * @return {function} listener
- * @public
- */
-
-function onHeaders (res, listener) {
-  if (!res) {
-    throw new TypeError('argument res is required')
-  }
-
-  if (typeof listener !== 'function') {
-    throw new TypeError('argument listener must be a function')
-  }
-
-  res.writeHead = createWriteHead(res.writeHead, listener)
-}
-
-/**
  * Set headers contained in array on the response object.
  *
  * @param {object} res
@@ -74,7 +47,7 @@ function onHeaders (res, listener) {
  */
 
 function setHeadersFromArray (res, headers) {
-  for (var i = 0; i < headers.length; i++) {
+  for (let i = 0; i < headers.length; i++) {
     res.setHeader(headers[i][0], headers[i][1])
   }
 }
@@ -88,9 +61,9 @@ function setHeadersFromArray (res, headers) {
  */
 
 function setHeadersFromObject (res, headers) {
-  var keys = Object.keys(headers)
-  for (var i = 0; i < keys.length; i++) {
-    var k = keys[i]
+  const keys = Object.keys(headers)
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i]
     if (k) res.setHeader(k, headers[k])
   }
 }
@@ -103,12 +76,12 @@ function setHeadersFromObject (res, headers) {
  */
 
 function setWriteHeadHeaders (statusCode) {
-  var length = arguments.length
-  var headerIndex = length > 1 && typeof arguments[1] === 'string'
+  const length = arguments.length
+  const headerIndex = length > 1 && typeof arguments[1] === 'string'
     ? 2
     : 1
 
-  var headers = length >= headerIndex + 1
+  const headers = length >= headerIndex + 1
     ? arguments[headerIndex]
     : undefined
 
@@ -123,10 +96,31 @@ function setWriteHeadHeaders (statusCode) {
   }
 
   // copy leading arguments
-  var args = new Array(Math.min(length, headerIndex))
-  for (var i = 0; i < args.length; i++) {
+  const args = new Array(Math.min(length, headerIndex))
+  for (let i = 0; i < args.length; i++) {
     args[i] = arguments[i]
   }
 
   return args
+}
+
+/**
+ * Module exports.
+ * Execute a listener when a response is about to write headers.
+ *
+ * @param {object} res
+ * @return {function} listener
+ * @public
+ */
+
+module.exports = (res, listener) => {
+  if (!res) {
+    throw new TypeError('argument res is required')
+  }
+
+  if (typeof listener !== 'function') {
+    throw new TypeError('argument listener must be a function')
+  }
+
+  res.writeHead = createWriteHead(res.writeHead, listener)
 }
