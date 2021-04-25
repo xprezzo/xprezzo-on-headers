@@ -42,7 +42,7 @@ http
 function addPoweredBy () {
   // set if not set by end of request
   if (!this.getHeader('X-Powered-By')) {
-    this.setHeader('X-Powered-By', 'Node.js')
+    this.setHeader('X-Powered-By', 'Xprezzo')
   }
 }
 
